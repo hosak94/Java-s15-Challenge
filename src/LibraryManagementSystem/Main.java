@@ -2,6 +2,7 @@ package LibraryManagementSystem;
 
 
 import LibraryManagementSystem.Database.Database;
+
 import LibraryManagementSystem.Person.Librarian;
 import LibraryManagementSystem.Person.Person;
 
@@ -13,22 +14,29 @@ public class Main {
     static Scanner s;
     static Database database;
 
+
     public static void main(String[] args) {
         database = new Database();
         System.out.println("Welcome to Library Management System!");
-        int num;
-        do{
-            System.out.println("0. Exit\n1.Login\n2. New Librarian"
-            );
+        int num = -1;
+        while (num != 0) {
+            System.out.println("0. Exit\n1. Login\n2. New Librarian\n3. List of Librarians");
             s = new Scanner(System.in);
             num = s.nextInt();
 
             switch (num) {
-                case 1: login();
-                case 2: newLibrarian();
+                case 1:
+                    login();
+                    break;
+                case 2:
+                    newLibrarian();
+                    break;
+                case 3:
+                    listLibrarians();
+                    break;
 
             }
-        }while (num != 0);
+        }
     }
     private static void login() {
         System.out.println("Enter email: ");
@@ -39,15 +47,19 @@ public class Main {
         if(flag != -1) {
             Person librarian = database.getLibrarian(flag);
             System.out.println("Welcome " +librarian.getFirstName()+ " "+ librarian.getLastName());
-            librarian.menu();
-
+          while (true) {
+              librarian.menu(database, (Librarian) librarian);
+              System.out.println("Do you want to continue in Librarian menu? (Y/N): ");
+              String continueChoice = s.next();
+              if (continueChoice.equalsIgnoreCase("n")) {
+                  break;
+              }
+          }
         }else {
             System.out.println("User doesn't exist!");
         }
     }
     private static void newLibrarian() {
-        System.out.println("Enter id: ");
-        int id = s.nextInt();
         System.out.println("Enter first name: ");
         String firstname = s.next();
         System.out.println("Enter last name: ");
@@ -56,17 +68,23 @@ public class Main {
         String email = s.next();
         System.out.println("Enter password: ");
         String password = s.next();
-        Person librarian = new Librarian(id,firstname,lastname,email,password);
+        Person librarian = new Librarian(firstname,lastname,email,password);
         database.addLibrarian((Librarian) librarian);
         System.out.println("User created successfully!");
     }
     private static void listLibrarians() {
         ArrayList<Librarian> librarians = database.getLibrarians();
-        for (Librarian librarian : librarians) {
-            System.out.println("ID: " + librarian.getId());
-            System.out.println("Name: " + librarian.getFirstName() + " " + librarian.getLastName());
-            System.out.println("Email: " + librarian.getEmail());
-            System.out.println("----------------------");
+
+            if(librarians.isEmpty()) {
+                System.out.println("No librarians found.");
+            }else{
+                System.out.println("List of Librarians");
+                for (Librarian librarian : librarians) {
+                    System.out.println("Name: " + librarian.getFirstName() + " " + librarian.getLastName());
+                    System.out.println("Email: " + librarian.getEmail());
+                    System.out.println("----------------------");
+            }
+
         }
     }
 
